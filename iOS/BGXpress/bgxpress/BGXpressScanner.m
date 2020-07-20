@@ -34,14 +34,15 @@
     CBCentralManager *manager;
 }
 
-- (id)init
+- (id)initWithRestorationIdentifier:(NSString *)identifier
 {
     self = [super init];
     if (self) {
         [self willChangeValueForKey:@"scanState"];
         _scanState = CantScan;
         [self didChangeValueForKey:@"scanState"];
-        manager = [[CBCentralManager alloc] initWithDelegate:self queue:nil];
+        manager = [[CBCentralManager alloc] initWithDelegate:self queue:nil
+                                                     options:@{ CBCentralManagerOptionRestoreIdentifierKey: identifier }];
         self.devicesDiscovered = [NSMutableArray arrayWithCapacity:100];
     }
     return self;
@@ -98,7 +99,7 @@
     return NO;
 }
 
-
+// MARK:- Central Manager Delegate
 - (void) centralManagerDidUpdateState:(CBCentralManager *)central
 {
     if (CBManagerStatePoweredOn == central.state) {
@@ -124,7 +125,7 @@
     }
 }
 
-- (void) centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary *)advertisementData RSSI:(NSNumber *)RSSI
+- (void)processDiscoveredPeripheral:(CBPeripheral * _Nonnull)peripheral rssi:(NSNumber * _Nullable)RSSI advertisementData:(NSDictionary * _Nullable)advertisementData
 {
     NSUInteger deviceIndex = [self.devicesDiscovered indexOfObjectPassingTest:^BOOL(id obj, NSUInteger idx, BOOL * stop) {
         BGXDevice * device = SafeType(obj, [BGXDevice class]);
@@ -135,7 +136,7 @@
         }
         return NO;
     }];
-    
+
     if (NSNotFound == deviceIndex) {
         BGXDevice * device = [BGXDevice deviceWithCBPeripheral:peripheral advertisementData:advertisementData rssi:RSSI discoveredBy:self];
         [self.devicesDiscovered addObject:device];
@@ -143,6 +144,11 @@
             [self.delegate deviceDiscovered:device];
         }
     }
+}
+
+- (void) centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary *)advertisementData RSSI:(NSNumber *)RSSI
+{
+    [self processDiscoveredPeripheral:peripheral rssi:RSSI advertisementData:advertisementData];
 }
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral
@@ -178,6 +184,20 @@
                 [idevice deviceDidDisconnect];
                 return;
             }
+        }
+    }
+}
+
+- (void)centralManager:(CBCentralManager *)central willRestoreState:(NSDictionary<NSString *,id> *)state
+{
+    NSArray *restoredPeripherals = state[CBCentralManagerRestoredStatePeripheralsKey];
+    NSLog(@"Restored peripherals: %@", restoredPeripherals);
+    for (CBPeripheral *peripheral in restoredPeripherals) {
+        [self processDiscoveredPeripheral:peripheral rssi:nil advertisementData:nil];
+    }
+    for (NSString *restoredService in state[CBCentralManagerRestoredStateScanServicesKey]) {
+        if ([restoredService isEqual:SERVICE_BGXSS_UUID]) {
+            
         }
     }
 }
