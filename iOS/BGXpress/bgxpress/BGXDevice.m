@@ -76,13 +76,21 @@ const NSUInteger kHandlerDefaultCapacity = 0x10;
 {
     self = [super init];
     if (self) {
-        device_name = [advData objectForKey:@"kCBAdvDataLocalName"];
+        if(advData != nil) {
+            device_name = [advData objectForKey:@"kCBAdvDataLocalName"];
+        } else {
+            device_name = peripheralParam.name;
+        }
         
         _scanner = scanner;
         peripheral = peripheralParam;
         peripheral.delegate = self;
-        _rssi = rssi;
-        _deviceState = Disconnected;
+
+        if(peripheral.state == CBPeripheralStateConnected) {
+            [self deviceDidConnect];
+        } else {
+            _deviceState = Disconnected;
+        }
         _busMode = UNKNOWN_MODE;
         _connectionTimer = nil;
         rssiTimer = nil;

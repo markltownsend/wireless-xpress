@@ -44,6 +44,8 @@
         manager = [[CBCentralManager alloc] initWithDelegate:self queue:nil
                                                      options:@{ CBCentralManagerOptionRestoreIdentifierKey: identifier }];
         self.devicesDiscovered = [NSMutableArray arrayWithCapacity:100];
+
+        self.restoredPeripherals = [NSMutableArray arrayWithCapacity:100];
     }
     return self;
 }
@@ -110,6 +112,7 @@
             if ([self.delegate respondsToSelector:@selector(scanStateChanged:)]) {
                 [self.delegate scanStateChanged:_scanState];
             }
+            [self processRestoredPeripherals];
         }
     } else {
         [self willChangeValueForKey:@"scanState"];
@@ -122,6 +125,14 @@
     
     if ([self.delegate respondsToSelector:@selector(bluetoothStateChanged:)]) {
         [self.delegate bluetoothStateChanged:central.state];
+    }
+}
+
+- (void)processRestoredPeripherals
+{
+    NSLog(@"Restoring Peripherals");
+    for(CBPeripheral *peripheral in self.restoredPeripherals) {
+        [self processDiscoveredPeripheral:peripheral rssi:nil advertisementData:nil];
     }
 }
 
@@ -193,15 +204,9 @@
     NSArray *restoredPeripherals = state[CBCentralManagerRestoredStatePeripheralsKey];
     NSLog(@"Restored peripherals: %@", restoredPeripherals);
     for (CBPeripheral *peripheral in restoredPeripherals) {
-        [self processDiscoveredPeripheral:peripheral rssi:nil advertisementData:nil];
-    }
-    for (NSString *restoredService in state[CBCentralManagerRestoredStateScanServicesKey]) {
-        if ([restoredService isEqual:SERVICE_BGXSS_UUID]) {
-            
-        }
+        [self.restoredPeripherals addObject:peripheral];
     }
 }
-
 
 - (CBCentralManager *)centralManager
 {

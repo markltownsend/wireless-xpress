@@ -99,6 +99,7 @@ typedef NS_ENUM(NSUInteger, ScanState) {
  * This property will be made read only and immutable in the future.
  */
 @property(nonatomic, strong) NSMutableArray * devicesDiscovered;
+@property(nonatomic, strong) NSMutableArray<CBPeripheral *> *restoredPeripherals;
 
 /**
  * The current state of the scanner.
