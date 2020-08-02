@@ -28,9 +28,9 @@
 	<string>MISSING_KEY</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>This app uses Bluetooth to communicate with the SiliconLabs BGX UART Bridge.</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>This app uses Bluetooth to communicate with the SiliconLabs BGX UART Bridge.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>This app uses Bluetooth to communicate with the SiliconLabs BGX UART Bridge.</string>
 	<key>UIAppFonts</key>
 	<array>
