@@ -593,7 +593,9 @@ const NSUInteger kHandlerDefaultCapacity = 0x10;
         _modelNumber = [[NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding];
         
         NSLog(@"Model Number: %@", _modelNumber);
-        [peripheral readValueForCharacteristic:modeChar];
+        if(modeChar != nil) {
+            [peripheral readValueForCharacteristic:modeChar];
+        }
     }
 }
 
