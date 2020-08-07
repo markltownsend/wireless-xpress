@@ -71,7 +71,7 @@ typedef NS_ENUM(NSUInteger, ScanState) {
 }
 
 /// Call this method to start scanning devices registering the manager with a restorationIdentifier
-- (id)initWithRestorationIdentifier:(NSString *)identifier;
+- (id)initWithRestorationIdentifier:(nullable NSString * )identifier;
 /**
  * Call this method to start scanning for devices.
  *

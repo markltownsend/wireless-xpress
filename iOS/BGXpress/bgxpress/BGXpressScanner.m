@@ -34,15 +34,19 @@
     CBCentralManager *manager;
 }
 
-- (id)initWithRestorationIdentifier:(NSString *)identifier
+- (id)initWithRestorationIdentifier:(nullable NSString *)identifier
 {
     self = [super init];
     if (self) {
         [self willChangeValueForKey:@"scanState"];
         _scanState = CantScan;
         [self didChangeValueForKey:@"scanState"];
-        manager = [[CBCentralManager alloc] initWithDelegate:self queue:nil
-                                                     options:@{ CBCentralManagerOptionRestoreIdentifierKey: identifier }];
+        if(identifier == [NSNull null] || identifier.length == 0) {
+            manager = [[CBCentralManager alloc] initWithDelegate:self queue:nil];
+        } else {
+            manager = [[CBCentralManager alloc] initWithDelegate:self queue:nil
+                                                         options:@{ CBCentralManagerOptionRestoreIdentifierKey: identifier }];
+        }
         self.devicesDiscovered = [NSMutableArray arrayWithCapacity:100];
 
         self.restoredPeripherals = [NSMutableArray arrayWithCapacity:100];
