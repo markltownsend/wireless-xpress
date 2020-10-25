@@ -116,8 +116,8 @@
             if ([self.delegate respondsToSelector:@selector(scanStateChanged:)]) {
                 [self.delegate scanStateChanged:_scanState];
             }
-            [self processRestoredPeripherals];
         }
+        [self processRestoredPeripherals];
     } else {
         [self willChangeValueForKey:@"scanState"];
         _scanState = CantScan;
@@ -134,9 +134,11 @@
 
 - (void)processRestoredPeripherals
 {
-    NSLog(@"Restoring Peripherals");
-    for(CBPeripheral *peripheral in self.restoredPeripherals) {
-        [self processDiscoveredPeripheral:peripheral rssi:nil advertisementData:nil];
+    if (self.restoredPeripherals.count > 0) {
+        NSLog(@"Restoring Peripherals");
+        for(CBPeripheral *peripheral in self.restoredPeripherals) {
+            [self processDiscoveredPeripheral:peripheral rssi:nil advertisementData:nil];
+        }
     }
 }
 
@@ -207,6 +209,7 @@
 {
     NSArray *restoredPeripherals = state[CBCentralManagerRestoredStatePeripheralsKey];
     NSLog(@"Restored peripherals: %@", restoredPeripherals);
+//    [self.restoredPeripherals removeAllObjects];
     for (CBPeripheral *peripheral in restoredPeripherals) {
         [self.restoredPeripherals addObject:peripheral];
     }

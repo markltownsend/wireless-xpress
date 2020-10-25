@@ -86,11 +86,7 @@ const NSUInteger kHandlerDefaultCapacity = 0x10;
         peripheral = peripheralParam;
         peripheral.delegate = self;
 
-        if(peripheral.state == CBPeripheralStateConnected) {
-            [self deviceDidConnect];
-        } else {
-            _deviceState = Disconnected;
-        }
+        _deviceState = Disconnected;
         _busMode = UNKNOWN_MODE;
         _connectionTimer = nil;
         rssiTimer = nil;
